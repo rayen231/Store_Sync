@@ -1,0 +1,1 @@
+Body contain the shape of the page and all the files are relied and call their self 

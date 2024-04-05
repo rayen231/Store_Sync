@@ -1,7 +1,8 @@
+package UI;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 public class LoginUI extends JFrame {
     // Labels
@@ -20,7 +21,6 @@ public class LoginUI extends JFrame {
         super("Login");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(300, 150);
-        //pack();
         setLocationRelativeTo(null);
 
         // Panels
@@ -48,6 +48,9 @@ public class LoginUI extends JFrame {
                 if (isValidLogin(username, password)) {
                     JOptionPane.showMessageDialog(LoginUI.this, "Login successful");
                     // Redirect to main application window or perform any other action
+                    // Here, you can open the main application window
+                    new Home();
+                    dispose(); // Close the login window
                 } else {
                     JOptionPane.showMessageDialog(LoginUI.this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -65,6 +68,9 @@ public class LoginUI extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
+        // Adjusting colors and styles
+        customizeUI();
+
         setVisible(true);
     }
 
@@ -74,11 +80,28 @@ public class LoginUI extends JFrame {
         return username.equals("admin") && password.equals("admin");
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new LoginUI();
-            }
-        });
+    // Method to adjust colors and styles
+ // Method to adjust colors and styles
+    private void customizeUI() {
+        getContentPane().setBackground(new Color(0, 100, 0)); // Less bright green color
+
+        usernameLabel.setForeground(new Color(0, 100, 0)); // Less bright green color
+        passwordLabel.setForeground(new Color(0, 100, 0)); // Less bright green color
+
+        usernameField.setBackground(new Color(230, 230, 230)); // Light gray
+        passwordField.setBackground(new Color(230, 230, 230)); // Light gray
+
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setBackground(new Color(0, 100, 0)); // Less bright green color
+        loginButton.setFocusPainted(false);
+
+        cancelButton.setForeground(Color.WHITE);
+        cancelButton.setBackground(new Color(0, 100, 0)); // Less bright green color
+        cancelButton.setFocusPainted(false);
     }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(LoginUI::new);
+    }
+
 }
