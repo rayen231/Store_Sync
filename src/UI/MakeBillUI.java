@@ -183,6 +183,12 @@ public class MakeBillUI extends JFrame {
                dispose();
             // Hide other panels if needed
         });
+        productManagementButton.addActionListener(e -> {
+            // Show home page panel
+            new ProductManagmentUI();
+            dispose();
+            // Hide other panels if needed
+        });
 
         // Add buttons to the side bar panel
         sideBarPanel.setLayout(new BoxLayout(sideBarPanel, BoxLayout.Y_AXIS));

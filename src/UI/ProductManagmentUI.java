@@ -1,31 +1,19 @@
 package UI;
-import java.awt.BorderLayout;
 
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.*;
-
 
 public class ProductManagmentUI extends JFrame {
 
-    
     public ProductManagmentUI() {
-    	super("Sales Management App");
+        super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1000, 700);
         setLocationRelativeTo(null);
-        
-     // Logo
+
+        // Logo
         ImageIcon logoIcon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
         Image img = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         ImageIcon newLogoIcon = new ImageIcon(img);
@@ -38,7 +26,7 @@ public class ProductManagmentUI extends JFrame {
         userProfileButton.setBackground(Color.WHITE);
         userProfileButton.setFocusPainted(false);
 
-     // User Name (Clickable)
+        // User Name (Clickable)
         JLabel userNameLabel = new JLabel("John Doe");
         userNameLabel.setForeground(Color.WHITE);
         userNameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Set cursor to hand
@@ -56,9 +44,7 @@ public class ProductManagmentUI extends JFrame {
         JPanel homePagePanel = new JPanel(new BorderLayout());
         homePagePanel.setBackground(new Color(230, 230, 230)); // Light gray
         homePagePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        // Features
-        
+
         //-----------------------------------------------------
 
         JLabel lid = new JLabel("ID");
@@ -83,24 +69,27 @@ public class ProductManagmentUI extends JFrame {
         JButton manageSalesButton = new JButton("Manage Sales");
         JButton makeBillButton = new JButton("Make Bill");
         JButton productManagementButton = new JButton("Product Management");
-        
+
         TableProductManagment tm = new TableProductManagment();
-        JTable tableau= new JTable(tm);
+        JTable tableau = new JTable(tm);
         JScrollPane jsp = new JScrollPane(tableau);
+        // Change table title color
+        tableau.getTableHeader().setBackground(new Color(0, 100, 0)); // Darker green
+        tableau.getTableHeader().setForeground(Color.WHITE);
 
         JPanel p1 = new JPanel(new BorderLayout());
         JPanel p11 = new JPanel(new GridLayout(5, 1)); // 5 rows, 2 columns
         JPanel p12 = new JPanel();
         JPanel p2 = new JPanel(new BorderLayout());
         JPanel p21 = new JPanel();
-        
+
         JPanel pt = new JPanel();
         JPanel pd = new JPanel();
         JPanel pp = new JPanel();
         JPanel pl = new JPanel();
         JPanel pq = new JPanel();
-        
-     // Set background colors for panels
+
+        // Set background colors for panels
         p1.setBackground(Color.WHITE);
         p2.setBackground(Color.WHITE);
         p11.setBackground(Color.WHITE);
@@ -109,26 +98,30 @@ public class ProductManagmentUI extends JFrame {
 
         // Set fonts for labels
         Font labelFont = new Font("Arial", Font.BOLD, 14);
+        // Change label text color to darker green
         lid.setFont(labelFont);
+        lid.setForeground(new Color(0, 100, 0)); // Darker green
         lname.setFont(labelFont);
+        lname.setForeground(new Color(0, 100, 0)); // Darker green
         ltype.setFont(labelFont);
+        ltype.setForeground(new Color(0, 100, 0)); // Darker green
         lplace.setFont(labelFont);
+        lplace.setForeground(new Color(0, 100, 0)); // Darker green
         lquantity.setFont(labelFont);
+        lquantity.setForeground(new Color(0, 100, 0)); // Darker green
         bajouter.setFont(labelFont);
         bannuler.setFont(labelFont);
-
         brecherche.setFont(labelFont);
 
         // Set background color and text color for buttons
-        bajouter.setBackground(Color.GREEN);
+        // Change button background to darker green and text color to white
+        bajouter.setBackground(new Color(0, 100, 0)); // Darker green
         bajouter.setForeground(Color.WHITE);
-        bannuler.setBackground(Color.BLUE);
+        bannuler.setBackground(new Color(0, 100, 0)); // Darker green
         bannuler.setForeground(Color.WHITE);
-
-
-        brecherche.setBackground(Color.ORANGE);
+        brecherche.setBackground(new Color(0, 100, 0)); // Darker green
         brecherche.setForeground(Color.WHITE);
-        
+
         pt.add(lid);
         pt.add(tid);
 
@@ -144,7 +137,6 @@ public class ProductManagmentUI extends JFrame {
         pq.add(lquantity);
         pq.add(tquantity);
 
-        
         p11.add(pt);
         p11.add(pd);
         p11.add(pp);
@@ -155,63 +147,50 @@ public class ProductManagmentUI extends JFrame {
         p12.add(bajouter);
         p12.add(bannuler);
         p1.add(p12, BorderLayout.SOUTH);
-        
+
 
         p21.add(brecherche);
         p21.add(trecherche);
         p2.add(p21, BorderLayout.NORTH);
 
-        
         JPanel CORRECTPanel = new JPanel(new BorderLayout());
-        
+
         CORRECTPanel.add(p1, BorderLayout.NORTH);
-        CORRECTPanel.add(jsp);
+        CORRECTPanel.add(jsp, BorderLayout.CENTER);
         CORRECTPanel.add(p2, BorderLayout.SOUTH);
-        
-        
-        
-        
+
         homePagePanel.add(CORRECTPanel, BorderLayout.CENTER);
-        
+
         //-----------------------------------------------------
-        
-        
-        // 7OT LINA CODE ALI FI WOSTTT JUST LI NI4AM WBARAAAA
-        
-     // Side Bar
+
+        // Side Bar
         JPanel sideBarPanel = new JPanel();
         sideBarPanel.setBackground(new Color(0, 100, 0)); // Less bright green color
         sideBarPanel.setPreferredSize(new Dimension(200, getHeight()));
-        
-        
-     // Add options to the side bar
-        JButton homeButton = new JButton("Home");
+
+        // Add options to the side bar
         styleButton(homeButton);
-        JButton manageSalesButton = new JButton("Manage Sales");
         styleButton(manageSalesButton);
-        JButton makeBillButton = new JButton("Make Bill");
         styleButton(makeBillButton);
-        JButton productManagementButton = new JButton("Product Management");
         styleButton(productManagementButton);
 
         // Add action listeners to the side bar buttons
         homeButton.addActionListener(e -> {
             // Show home page panel
-            new Body();
+            new Home();
             dispose();
             // Hide other panels if needed
         });
         makeBillButton.addActionListener(e -> {
             // Show home page panel
-        	new MakeBillUI();
-        	 dispose();
+            new MakeBillUI();
+            dispose();
             // Hide other panels if needed
         });
-        
         productManagementButton.addActionListener(e -> {
             // Show home page panel
-        	new ProductManagmentUI();
-        	 dispose();
+            new ProductManagmentUI();
+            dispose();
             // Hide other panels if needed
         });
 
@@ -255,10 +234,10 @@ public class ProductManagmentUI extends JFrame {
         add(mainPanel);
 
         setVisible(true);
-        
+
     }
-    
- // Method to style buttons
+
+    // Method to style buttons
     private void styleButton(JButton button) {
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(0, 100, 0)); // Less bright green color
@@ -269,6 +248,6 @@ public class ProductManagmentUI extends JFrame {
     }
 
     public static void main(String[] args) {
-    	SwingUtilities.invokeLater(Body::new);
+        SwingUtilities.invokeLater(ProductManagmentUI::new);
     }
 }
