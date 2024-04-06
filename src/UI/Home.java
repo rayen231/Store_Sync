@@ -14,7 +14,10 @@ public class Home extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1000, 700);
         setLocationRelativeTo(null);
-
+        //Change the icon window image
+        ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
+        Image iconImage = icon.getImage();
+        setIconImage(iconImage);
         // Logo
         ImageIcon logoIcon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
         Image img = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
@@ -92,6 +95,12 @@ public class Home extends JFrame {
         productManagementButton.addActionListener(e -> {
             // Show home page panel
             new ProductManagmentUI();
+            dispose();
+            // Hide other panels if needed
+        });
+        manageSalesButton.addActionListener(e -> {
+            // Show home page panel
+            new ManageSalesUI();
             dispose();
             // Hide other panels if needed
         });

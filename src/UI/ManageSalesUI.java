@@ -1,21 +1,16 @@
 package UI;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.HashMap;
-import java.util.Map;
 
-public class MakeBillUI extends JFrame {
+public class ManageSalesUI extends JFrame {
 
-    protected static final Integer Qts = null;
-
-	public MakeBillUI() {
+    public ManageSalesUI() {
+    	
         super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1000, 700);
@@ -25,6 +20,17 @@ public class MakeBillUI extends JFrame {
         ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
         Image iconImage = icon.getImage();
         setIconImage(iconImage);
+        
+        //Table 
+        Object[][] data = {
+                {"2024-01-01", 1000, 2000, 1000},
+                {"2024-01-02", 1500, 2500, 1000},
+                {"2024-01-03", 1200, 1800, 600},
+                {"2024-01-04", 800, 2200, 1400},
+                {"2024-01-05", 1100, 2100, 1000},
+                {"2024-01-06", 1300, 2400, 1100}
+        };
+        String[] columns = {"Date", "Expenses", "Income", "Profit"};
 
         // Logo
         ImageIcon logoIcon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
@@ -39,7 +45,7 @@ public class MakeBillUI extends JFrame {
         userProfileButton.setBackground(Color.WHITE);
         userProfileButton.setFocusPainted(false);
 
-        // User Name (Clickable)
+     // User Name (Clickable)
         JLabel userNameLabel = new JLabel("John Doe");
         userNameLabel.setForeground(Color.WHITE);
         userNameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Set cursor to hand
@@ -50,6 +56,7 @@ public class MakeBillUI extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 // Perform action here
                 JOptionPane.showMessageDialog(null, "User Profile Clicked");
+                new EditUser();
             }
         });
 
@@ -58,114 +65,76 @@ public class MakeBillUI extends JFrame {
         homePagePanel.setBackground(new Color(230, 230, 230)); // Light gray
         homePagePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Title Panel (from MakeBillUI)
-        JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBackground(new Color(46, 139, 87)); // Dark green color
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Title
 
-        JLabel titleLabel = new JLabel("Create New Bill");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titlePanel.add(titleLabel, BorderLayout.CENTER);
-
-        homePagePanel.add(titlePanel, BorderLayout.NORTH);
-
-        // Form Panel (from MakeBillUI)
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = GridBagConstraints.RELATIVE;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        JLabel cinLabel = new JLabel("Customer Identification Number (CIN):");
-        cinLabel.setForeground(new Color(46, 139, 87)); // Dark green color
-        formPanel.add(cinLabel, gbc);
-
-        JTextField cinTextField = new JTextField(20);
-        gbc.gridx = 1;
-        formPanel.add(cinTextField, gbc);
-
-        JLabel nameLabel = new JLabel("Customer Name:");
-        nameLabel.setForeground(new Color(46, 139, 87)); // Dark green color
-        gbc.gridx = 0;
-        formPanel.add(nameLabel, gbc);
-
-        JTextField nameTextField = new JTextField(20);
-        gbc.gridx = 1;
-        formPanel.add(nameTextField, gbc);
-
-        JLabel itemsLabel = new JLabel("Items Purchased:");
-        itemsLabel.setForeground(new Color(46, 139, 87)); // Dark green color
-        gbc.gridx = 0;
-        formPanel.add(itemsLabel, gbc);
-
-        JTextField itemsTextField = new JTextField(20);
-        gbc.gridx = 1;
-        formPanel.add(itemsTextField, gbc);
-
-        JLabel quantityLabel = new JLabel("Quantity:");
-        quantityLabel.setForeground(new Color(46, 139, 87)); // Dark green color
-        gbc.gridx = 0;
-        formPanel.add(quantityLabel, gbc);
-
-        JTextField quantityTextField = new JTextField(5);
-        gbc.gridx = 1;
-        formPanel.add(quantityTextField, gbc);
-
-        homePagePanel.add(formPanel, BorderLayout.CENTER);
-
-        // Buttons Panel (from MakeBillUI)
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setBackground(Color.WHITE);
-
-        JButton addButton = new JButton("Add Item");
-        addButton.setForeground(Color.WHITE);
-        addButton.setBackground(new Color(46, 139, 87)); // Dark green color
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Get the item and quantity from text fields
-                String item = itemsTextField.getText();
-                String quantityText = quantityTextField.getText();
-                
-                try {
-                    // Convert the quantity text to an integer
-                    int quantity = Integer.parseInt(quantityText);
-                    
-                    // If quantity is valid, store the item and quantity
-                     Map<String, Integer> textQuantityDict = new HashMap<>();
-                    textQuantityDict.put(item, quantity);
-                    
-                    // Output for verification
-                    System.out.println("Item: " + item + ", Quantity: " + quantity);
-                    
-                    // Reset text fields
-                    itemsTextField.setText("");
-                    quantityTextField.setText("");
-                } catch (NumberFormatException ex) {
-                    // Handle the case where the text cannot be parsed as an integer
-                    JOptionPane.showMessageDialog(null, "Please enter a valid integer for quantity.");
-                }
-            }
-        });
-
-        JButton submitButton = new JButton("Submit Bill");
-        submitButton.setForeground(Color.WHITE);
-        submitButton.setBackground(new Color(46, 139, 87)); // Dark green color
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Implement submitting bill functionality
-            }
-        });
-
-        buttonPanel.add(addButton);
-        buttonPanel.add(submitButton);
-        homePagePanel.add(buttonPanel, BorderLayout.SOUTH);
-
+        // Features
+        //labels
+        JLabel todaySaleLabel = new JLabel("<html><font size='6' color='#006400'>Today's Income</font></html>");
+        JLabel totalRevenueLabel = new JLabel("<html><font size='6' color='#006400'>Month's income</font></html>");
+        JLabel Profit = new JLabel("<html><font size='6' color='#006400'>income deviation</font></html>");
+        
+        JLabel todaySaleLabelT = new JLabel("<html><font size='6' color='#006400'>12$</font></html>");
+        JLabel totalRevenueLabelT = new JLabel("<html><font size='6' color='#006400'>120$</font></html>");
+        JLabel ProfitT = new JLabel("<html><font size='6' color='#006400'>+50$</font></html>");
+        
+        JLabel from = new JLabel("<html><font size='4' color='#006400'>From</font></html>");
+        JLabel to = new JLabel("<html><font size='4' color='#006400'>To</font></html>");
+        JTextField fromT = new JTextField(20);
+        JTextField toT = new JTextField(20);
+        JButton searchButton = new JButton("Search");
+        searchButton.setForeground(Color.WHITE);
+        searchButton.setBackground(new Color(46, 139, 87)); // Dark green color
+        
+        
+        // panels
+        JPanel featurePanel = new JPanel();
+        JPanel toppanel = new JPanel();
+        JPanel midpanel = new JPanel();
+        JPanel labelPanel  = new JPanel();
+        JPanel labelPanel2  = new JPanel();
+        labelPanel.setLayout(new FlowLayout());
+        featurePanel.setLayout(new BorderLayout());
+        toppanel.setLayout(new BorderLayout());
+        
+        //Table 
+        SalesTableModel model = new SalesTableModel(data, columns);
+        JTable table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+        
+        
+        // LABEL PANEL 1
+        labelPanel.setLayout(new FlowLayout()); // Use FlowLayout for horizontal arrangement
+        labelPanel.add(todaySaleLabel);
+        labelPanel.add(Box.createHorizontalStrut(20)); // Add 20 pixels of space to make spaces beetwenn the labels
+        labelPanel.add(totalRevenueLabel);
+        labelPanel.add(Box.createHorizontalStrut(20)); // Add another 20 pixels of space
+        labelPanel.add(Profit);
+        //LABEL PANEL 2
+        labelPanel2.setLayout(new FlowLayout()); // Use FlowLayout for horizontal arrangement
+        labelPanel2.add(Box.createHorizontalStrut(65));
+        labelPanel2.add(todaySaleLabelT);
+        labelPanel2.add(Box.createHorizontalStrut(150)); // Add 20 pixels of space to make spaces beetwenn the labels and be under the label of their text
+        labelPanel2.add(totalRevenueLabelT);
+        labelPanel2.add(Box.createHorizontalStrut(125)); // Add another 125 pixels of space
+        labelPanel2.add(ProfitT);
+        labelPanel2.add(Box.createHorizontalStrut(100)); // Add another 100 pixels of space
+        //ADIING TO toppanel PANEL
+        toppanel.add(labelPanel ,BorderLayout.NORTH);
+        toppanel.add(labelPanel2 ,BorderLayout.CENTER);
+        //MIDPANNEL
+        midpanel.add(from);
+        midpanel.add(fromT);
+        labelPanel2.add(Box.createHorizontalStrut(200));
+        midpanel.add(to);
+        midpanel.add(toT);
+        labelPanel2.add(Box.createHorizontalStrut(200));
+        midpanel.add(searchButton);
+        //ADDING TO THE FEATURE PANEL
+        featurePanel.add(toppanel, BorderLayout.NORTH);
+        featurePanel.add(midpanel, BorderLayout.CENTER);
+        featurePanel.add(scrollPane,BorderLayout.SOUTH);
+        //ADDING TO THE MAIN PANEL
+        homePagePanel.add(featurePanel, BorderLayout.NORTH);
         // Side Bar
         JPanel sideBarPanel = new JPanel();
         sideBarPanel.setBackground(new Color(0, 100, 0)); // Less bright green color
@@ -184,8 +153,14 @@ public class MakeBillUI extends JFrame {
         // Add action listeners to the side bar buttons
         homeButton.addActionListener(e -> {
             // Show home page panel
-        	   new Home();
-               dispose();
+            new Home();
+            dispose();
+            // Hide other panels if needed
+        });
+        makeBillButton.addActionListener(e -> {
+            // Show home page panel
+        	new MakeBillUI();
+        	 dispose();
             // Hide other panels if needed
         });
         productManagementButton.addActionListener(e -> {
@@ -200,6 +175,7 @@ public class MakeBillUI extends JFrame {
             dispose();
             // Hide other panels if needed
         });
+
 
         // Add buttons to the side bar panel
         sideBarPanel.setLayout(new BoxLayout(sideBarPanel, BoxLayout.Y_AXIS));
@@ -220,13 +196,13 @@ public class MakeBillUI extends JFrame {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(0, 100, 0)); // Less bright green color
         headerPanel.add(logoLabel, BorderLayout.WEST);
-        JPanel titlePanel2 = new JPanel();
-        titlePanel2.setBackground(new Color(0, 100, 0)); // Less bright green color
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(new Color(0, 100, 0)); // Less bright green color
         JLabel appTitleLabel = new JLabel("Sales Management App");
         appTitleLabel.setForeground(Color.WHITE);
         appTitleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titlePanel2.add(appTitleLabel);
-        headerPanel.add(titlePanel2, BorderLayout.CENTER);
+        titlePanel.add(appTitleLabel);
+        headerPanel.add(titlePanel, BorderLayout.CENTER);
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         userPanel.setBackground(new Color(0, 100, 0)); // Less bright green color
         userPanel.add(userNameLabel);
@@ -254,6 +230,6 @@ public class MakeBillUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MakeBillUI::new);
+        SwingUtilities.invokeLater(ManageSalesUI::new);
     }
 }
