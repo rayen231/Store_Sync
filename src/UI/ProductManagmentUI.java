@@ -1,6 +1,7 @@
 package UI;
 
 import java.awt.*;
+import Sql.ProductManipulator;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
@@ -41,7 +42,8 @@ public class ProductManagmentUI extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Perform action here
-                JOptionPane.showMessageDialog(null, "User Profile Clicked");
+                //JOptionPane.showMessageDialog(null, "User Profile Clicked");
+                new EditUser();
             }
         });
 
@@ -243,7 +245,38 @@ public class ProductManagmentUI extends JFrame {
 
         // Add components to the frame
         add(mainPanel);
-
+        
+        
+        // SQL MANAGEMENT (  ADD )
+        bajouter.addActionListener(e -> {
+            // Getting info from textfield
+        	int id= Integer.parseInt(tid.getText());
+        	String place = tplace.getText();
+        	String selectedType = (String) typeDropdown.getSelectedItem(); 
+        	String name=tname.getText();
+        	int qts=Integer.parseInt(tquantity.getText());
+        	// calling the add method
+        	ProductManipulator p = new ProductManipulator();
+        	p.addProduct(id, name,selectedType, place, qts)  ;    
+        	// initial info from textfield
+        	tid.setText("");
+        	tplace.setText("");
+        	tname.setText("");
+        	tquantity.setText("");
+        });
+        
+        
+     // NO SQL MANAGEMENT (  cancel )
+        bannuler.addActionListener(e -> {
+            // initial info from textfield
+        	tid.setText("");
+        	tplace.setText("");
+        	tname.setText("");
+        	tquantity.setText("");
+        });
+        
+        
+         
         setVisible(true);
 
     }

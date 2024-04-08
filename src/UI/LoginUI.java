@@ -1,6 +1,7 @@
 package UI;
 
 import javax.swing.*;
+import Sql.LoginManipulator;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -77,7 +78,11 @@ public class LoginUI extends JFrame {
     // Dummy method to simulate login validation
     private boolean isValidLogin(String username, String password) {
         // Replace this with actual login validation logic
-        return username.equals("admin") && password.equals("admin");
+        //return username.equals("admin") && password.equals("admin");
+    	LoginManipulator l= new LoginManipulator();
+    	return l.check(username, password);
+    	
+    	
     }
 
     // Method to adjust colors and styles

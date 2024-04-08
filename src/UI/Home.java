@@ -41,7 +41,7 @@ public class Home extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Perform action here
-                JOptionPane.showMessageDialog(null, "User Profile Clicked");
+                //JOptionPane.showMessageDialog(null, "User Profile Clicked");
                 new EditUser();
             }
         });
