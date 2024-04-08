@@ -70,7 +70,7 @@ public class ManageSalesUI extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 // Perform action here
                 JOptionPane.showMessageDialog(null, "User Profile Clicked");
-                new EditUser();
+                new EditUser(passed);
             }
         });
 
