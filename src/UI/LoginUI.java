@@ -10,9 +10,7 @@ public class LoginUI extends JFrame {
     JLabel usernameLabel = new JLabel("Username:");
     JLabel passwordLabel = new JLabel("Password:");
     
-    //Change the icon window image
-    ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
-    Image iconImage = icon.getImage();
+    
     
     // Text Fields
     JTextField usernameField = new JTextField(15);
@@ -27,6 +25,11 @@ public class LoginUI extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(300, 150);
         setLocationRelativeTo(null);
+        
+      //Change the icon window image
+        ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
+        Image iconImage = icon.getImage();
+        setIconImage(iconImage);
 
         // Panels
         JPanel mainPanel = new JPanel(new GridLayout(3, 2));

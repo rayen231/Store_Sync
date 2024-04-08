@@ -35,12 +35,16 @@ import java.util.Map;
 public class MakeBillUI extends JFrame {
 
     protected static final Integer Qts = null;
+    private Map<String, Integer> textQuantityDict;
 
 	public MakeBillUI(String passed) {
         super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1000, 700);
         setLocationRelativeTo(null);
+        
+        // Initialize the map in the constructor
+        textQuantityDict = new HashMap<>();
         
         //Change the icon window image
         ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
@@ -157,7 +161,6 @@ public class MakeBillUI extends JFrame {
                     int quantity = Integer.parseInt(quantityText);
                     
                     // If quantity is valid, store the item and quantity
-                     Map<String, Integer> textQuantityDict = new HashMap<>();
                     textQuantityDict.put(item, quantity);
                     
                     // Output for verification
@@ -207,6 +210,12 @@ public class MakeBillUI extends JFrame {
                 //} catch (IOException e1) {
                     //e1.printStackTrace();
                 //}
+            	
+            	//adding bill into the DB
+            	String cin=cinTextField.getText();
+            	String name=nameTextField.getText();
+            	add(cin,name,textQuantityDict);
+            	
             }
         });
 
@@ -345,6 +354,39 @@ public class MakeBillUI extends JFrame {
 
     return path;
 }
+    
+    //add bill in DB
+    public void add(String cin,String name,Map<String, Integer> items)
+    {
+    	// Convert the map to a string format
+        StringBuilder itemsStr = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : items.entrySet()) {
+            itemsStr.append(entry.getKey()).append(":").append(entry.getValue()).append(",");
+        }
+        String itemsString = itemsStr.toString();
+
+        // SQL statement to insert data into the Bills table
+        String sql = "INSERT INTO Bills (CIN, NAME, ITEMS) VALUES (?, ?, ?)";
+
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, cin);
+            statement.setString(2, name);
+            statement.setString(3, itemsString);
+
+            // Execute the insert statement
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception or log it as needed
+        }
+    }
+    
+    
+    
+    
+    
+    
     public static void main(String[] args, String passed) {
     	SwingUtilities.invokeLater(() -> new MakeBillUI(passed));
     }
