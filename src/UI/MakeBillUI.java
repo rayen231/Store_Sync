@@ -6,6 +6,10 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import Sql.DatabaseConnector;
 
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -16,6 +20,7 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.Copies;
 import java.awt.print.PrinterJob;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -182,39 +187,29 @@ public class MakeBillUI extends JFrame {
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Implement submitting bill functionality
-            	//try {
-                    // Create a new PDF document
-                    //PDDocument document = new PDDocument();
-                    //PDPage page = new PDPage();
-                    //document.addPage(page);
-
-                    // Write content to the PDF
-                    //PDPageContentStream contentStream = new PDPageContentStream(document, page);
-                    //PDType1Font font = Standard14Fonts.COURIER_BOLD;
-                    //contentStream.setFont(font, 12);
-                    //contentStream.beginText();
-                    //contentStream.newLineAtOffset(100, 700);
-                    //contentStream.showText("Hello, World!");
-                    //contentStream.endText();
-                    //contentStream.close();
-
-                    // Save the PDF document
-                    //File file = new File("example.pdf");
-                    //document.save(file);
-                    //document.close();
-
-                    // Print the PDF document
-                    //printPDF(file);
-
-                //} catch (IOException e1) {
-                    //e1.printStackTrace();
-                //}
             	
             	//adding bill into the DB
             	String cin=cinTextField.getText();
             	String name=nameTextField.getText();
             	add(cin,name,textQuantityDict);
+            	
+            	//Making pdf content
+            	String content="NAME : "+name+"\nCIN : "+cin+"\nITEMS : \n"+textQuantityDict.toString();
+            	
+            	// Generate PDF file
+                try {
+                    Document document = new Document();
+                    PdfWriter.getInstance(document, new FileOutputStream("output.pdf"));
+                    document.open();
+                    document.add(new Paragraph(content));
+                    document.close();
+                    System.out.println("PDF created successfully.");
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+
+                // Print the generated PDF file
+                printPDF("output.pdf");
             	
             }
         });
@@ -315,23 +310,7 @@ public class MakeBillUI extends JFrame {
         button.setAlignmentX(Component.CENTER_ALIGNMENT); // Align buttons to the center horizontally
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, button.getPreferredSize().height));
     }
-    public static void printPDF(File file) {
-        try {
-            PrinterJob job = PrinterJob.getPrinterJob();
-            PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-            if (printServices.length > 0) {
-                job.setPrintService(printServices[0]);
-                PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
-                printRequestAttributeSet.add(new Copies(1)); // Set number of copies
-                job.setPrintable(new PDFPrintable(file));
-                job.print(printRequestAttributeSet);
-            } else {
-                System.err.println("No printer found.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    
 
  // get pic PATH
     public static String path(String nom) {
@@ -381,7 +360,16 @@ public class MakeBillUI extends JFrame {
             // Handle the exception or log it as needed
         }
     }
-    
+    // printer function
+    public static void printPDF(String filename) {
+  	  try {
+  	    // Open the PDF with the default PDF viewer
+  	    Runtime.getRuntime().exec("explorer.exe " + filename);
+  	    // This might prompt a print dialog within the viewer.
+  	  } catch (Exception e) {
+  	    e.printStackTrace();
+  	  }
+  	}
     
     
     
