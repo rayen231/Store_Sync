@@ -1,15 +1,22 @@
 package UI;
 
 import javax.swing.*;
+
+import Sql.DatabaseConnector;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Home extends JFrame {
 
-    public Home() {
+    public Home(String passed) {
         super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1000, 700);
@@ -25,14 +32,14 @@ public class Home extends JFrame {
         JLabel logoLabel = new JLabel(newLogoIcon);
 
         // User Account Profile
-        ImageIcon userProfileIcon = new ImageIcon("user_profile.png");
+        ImageIcon userProfileIcon = new ImageIcon(path(passed));
         JButton userProfileButton = new JButton(userProfileIcon);
         userProfileButton.setPreferredSize(new Dimension(40, 40));
         userProfileButton.setBackground(Color.WHITE);
         userProfileButton.setFocusPainted(false);
 
      // User Name (Clickable)
-        JLabel userNameLabel = new JLabel("John Doe");
+        JLabel userNameLabel = new JLabel(passed);
         userNameLabel.setForeground(Color.WHITE);
         userNameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Set cursor to hand
 
@@ -82,25 +89,25 @@ public class Home extends JFrame {
         // Add action listeners to the side bar buttons
         homeButton.addActionListener(e -> {
             // Show home page panel
-            new Home();
+            new Home(passed);
             dispose();
             // Hide other panels if needed
         });
         makeBillButton.addActionListener(e -> {
             // Show home page panel
-        	new MakeBillUI();
+        	new MakeBillUI(passed);
         	 dispose();
             // Hide other panels if needed
         });
         productManagementButton.addActionListener(e -> {
             // Show home page panel
-            new ProductManagmentUI();
-            dispose();
+            //new ProductManagmentUI(passed);
+            //dispose();
             // Hide other panels if needed
         });
         manageSalesButton.addActionListener(e -> {
             // Show home page panel
-            new ManageSalesUI();
+            new ManageSalesUI(passed);
             dispose();
             // Hide other panels if needed
         });
@@ -156,8 +163,29 @@ public class Home extends JFrame {
         button.setAlignmentX(Component.CENTER_ALIGNMENT); // Align buttons to the center horizontally
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, button.getPreferredSize().height));
     }
+    
+    // get pic PATH
+    public static String path(String nom) {
+    String path = null;
+    String sql = "SELECT PATH FROM user WHERE NAME = ?";
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(Home::new);
+    try (Connection conn = DatabaseConnector.getConnection();
+         PreparedStatement statement = conn.prepareStatement(sql)) {
+        statement.setString(1, nom);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                path = resultSet.getString("PATH");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle the exception or log it as needed
+    }
+
+    return path;
+}
+    public static void main(String[] args, String passed) {
+    	SwingUtilities.invokeLater(() -> new Home(passed));
     }
 }

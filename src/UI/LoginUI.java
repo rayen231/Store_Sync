@@ -9,7 +9,11 @@ public class LoginUI extends JFrame {
     // Labels
     JLabel usernameLabel = new JLabel("Username:");
     JLabel passwordLabel = new JLabel("Password:");
-
+    
+    //Change the icon window image
+    ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
+    Image iconImage = icon.getImage();
+    
     // Text Fields
     JTextField usernameField = new JTextField(15);
     JPasswordField passwordField = new JPasswordField(15);
@@ -50,7 +54,7 @@ public class LoginUI extends JFrame {
                     JOptionPane.showMessageDialog(LoginUI.this, "Login successful");
                     // Redirect to main application window or perform any other action
                     // Here, you can open the main application window
-                    new Home();
+                    new Home(username);
                     dispose(); // Close the login window
                 } else {
                     JOptionPane.showMessageDialog(LoginUI.this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);

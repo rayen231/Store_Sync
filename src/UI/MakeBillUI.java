@@ -1,6 +1,27 @@
 package UI;
 
 import javax.swing.*;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+
+import Sql.DatabaseConnector;
+
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Copies;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,7 +36,7 @@ public class MakeBillUI extends JFrame {
 
     protected static final Integer Qts = null;
 
-	public MakeBillUI() {
+	public MakeBillUI(String passed) {
         super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1000, 700);
@@ -33,14 +54,14 @@ public class MakeBillUI extends JFrame {
         JLabel logoLabel = new JLabel(newLogoIcon);
 
         // User Account Profile
-        ImageIcon userProfileIcon = new ImageIcon("user_profile.png");
+        ImageIcon userProfileIcon = new ImageIcon(path(passed));
         JButton userProfileButton = new JButton(userProfileIcon);
         userProfileButton.setPreferredSize(new Dimension(40, 40));
         userProfileButton.setBackground(Color.WHITE);
         userProfileButton.setFocusPainted(false);
 
         // User Name (Clickable)
-        JLabel userNameLabel = new JLabel("John Doe");
+        JLabel userNameLabel = new JLabel(passed);
         userNameLabel.setForeground(Color.WHITE);
         userNameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Set cursor to hand
 
@@ -159,6 +180,33 @@ public class MakeBillUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Implement submitting bill functionality
+            	//try {
+                    // Create a new PDF document
+                    //PDDocument document = new PDDocument();
+                    //PDPage page = new PDPage();
+                    //document.addPage(page);
+
+                    // Write content to the PDF
+                    //PDPageContentStream contentStream = new PDPageContentStream(document, page);
+                    //PDType1Font font = Standard14Fonts.COURIER_BOLD;
+                    //contentStream.setFont(font, 12);
+                    //contentStream.beginText();
+                    //contentStream.newLineAtOffset(100, 700);
+                    //contentStream.showText("Hello, World!");
+                    //contentStream.endText();
+                    //contentStream.close();
+
+                    // Save the PDF document
+                    //File file = new File("example.pdf");
+                    //document.save(file);
+                    //document.close();
+
+                    // Print the PDF document
+                    //printPDF(file);
+
+                //} catch (IOException e1) {
+                    //e1.printStackTrace();
+                //}
             }
         });
 
@@ -184,20 +232,26 @@ public class MakeBillUI extends JFrame {
         // Add action listeners to the side bar buttons
         homeButton.addActionListener(e -> {
             // Show home page panel
-        	   new Home();
+        	   new Home(passed);
                dispose();
             // Hide other panels if needed
         });
         productManagementButton.addActionListener(e -> {
             // Show home page panel
-            new ProductManagmentUI();
-            dispose();
+            //new ProductManagmentUI();
+            //dispose();
             // Hide other panels if needed
         });
         manageSalesButton.addActionListener(e -> {
             // Show home page panel
-            new ManageSalesUI();
+            new ManageSalesUI(passed);
             dispose();
+            // Hide other panels if needed
+        });
+        makeBillButton.addActionListener(e -> {
+            // Show home page panel
+        	new MakeBillUI(passed);
+        	 dispose();
             // Hide other panels if needed
         });
 
@@ -252,8 +306,46 @@ public class MakeBillUI extends JFrame {
         button.setAlignmentX(Component.CENTER_ALIGNMENT); // Align buttons to the center horizontally
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, button.getPreferredSize().height));
     }
+    public static void printPDF(File file) {
+        try {
+            PrinterJob job = PrinterJob.getPrinterJob();
+            PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
+            if (printServices.length > 0) {
+                job.setPrintService(printServices[0]);
+                PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
+                printRequestAttributeSet.add(new Copies(1)); // Set number of copies
+                job.setPrintable(new PDFPrintable(file));
+                job.print(printRequestAttributeSet);
+            } else {
+                System.err.println("No printer found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(MakeBillUI::new);
+ // get pic PATH
+    public static String path(String nom) {
+    String path = null;
+    String sql = "SELECT PATH FROM user WHERE NAME = ?";
+
+    try (Connection conn = DatabaseConnector.getConnection();
+         PreparedStatement statement = conn.prepareStatement(sql)) {
+        statement.setString(1, nom);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                path = resultSet.getString("PATH");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle the exception or log it as needed
+    }
+
+    return path;
+}
+    public static void main(String[] args, String passed) {
+    	SwingUtilities.invokeLater(() -> new MakeBillUI(passed));
     }
 }

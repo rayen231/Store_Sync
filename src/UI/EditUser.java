@@ -14,6 +14,10 @@ public class EditUser extends JFrame {
         setSize(400, 300);
         setLocationRelativeTo(null);
 
+      //Change the icon window image
+        ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
+        Image iconImage = icon.getImage();
+        
         // Main panel with light gray background
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(new Color(230, 230, 230));

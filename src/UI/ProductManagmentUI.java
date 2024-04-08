@@ -1,297 +1,289 @@
 package UI;
 
-import java.awt.*;
-import Sql.ProductManipulator;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.*;
+import java.sql.*;
+import net.proteanit.sql.DbUtils;
+
+import java.awt.*;
 
 public class ProductManagmentUI extends JFrame {
+	
+	
+	
+	JLabel lidR = new JLabel("Id");
+	JLabel lid = new JLabel("Id");
+	JLabel lnom = new JLabel("Name");
+	JLabel ltype = new JLabel("Type");
+	JLabel lplace = new JLabel("Place");
+	JLabel lquantity = new JLabel("Quantity");
+	JLabel lrecherche = new JLabel("Recherche");
+	
+	JTextField tidR = new JTextField(10);
+	JTextField tid = new JTextField(10);
+	JTextField tnom = new JTextField(10);
+	JTextField tplace = new JTextField(10);
+	JTextField tquantity = new JTextField(10);
+	
+	
+	JButton bajouter = new JButton("Ajouter");
+	JButton bedit = new JButton("Edit");
+	JButton bsupprimer = new JButton("Supprimer");
+	JButton brecherche = new JButton("Recherche");
+	
+	JRadioButton bh = new JRadioButton("storehouse 1");
+	JRadioButton bf = new JRadioButton("storehouse 2");
+	
+	JComboBox<String> comboFilliere = new JComboBox<String>(new String[] {"breakable","not breakable"});
+	
+	ButtonGroup bg = new ButtonGroup();
+	
+	
+	JTable tableau= new JTable();
+	JScrollPane jsp = new JScrollPane(tableau);
+	
+	JPanel global = new JPanel (new GridLayout(1,1));
+	JPanel p1 = new JPanel (new GridLayout(2,2));
+	JPanel p11 = new JPanel ();
+	JPanel p12 = new JPanel ();
+	JPanel p2 = new JPanel (new BorderLayout());
+	JPanel p21 = new JPanel ();
+	JPanel p22 = new JPanel ();
+	
+	JPanel pn = new JPanel ();
+	JPanel pp = new JPanel ();
+	JPanel pl = new JPanel ();
+	JPanel pf = new JPanel ();
+	JPanel ps = new JPanel ();
+	JPanel pfr = new JPanel ();
+	
+	
+	
+	Connection con;
+	PreparedStatement pst;
+	ResultSet rs;
 
-    public ProductManagmentUI() {
-        super("Sales Management App");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 700);
-        setLocationRelativeTo(null);
-        
-        //Change the icon window image
-        ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
-        Image iconImage = icon.getImage();
-        setIconImage(iconImage);
+	void initialize() {
+		pn.add(lnom);
+		pn.add(tnom);
+		
+		
+		
+		pfr.add(lidR);
+		pfr.add(tidR);
+		
+		pl.add(lquantity);
+		pl.add(tquantity);
+		
+		pf.add(ltype);
+		pf.add(comboFilliere);
+		
+		ps.add(lplace);
+		ps.add(bh);
+		ps.add(bf);
+		
+		bg.add(bf);
+		bg.add(bh);
+		
+		p11.add(pn);p11.add(pl);p11.add(pf);p11.add(ps);
+		p1.add(p11, BorderLayout.NORTH);
+		
+		p12.add(bajouter);
+		
+		
+		
+		p1.add(p12);
+		global.add(p1);
+		
+		p21.add(pfr);p21.add(brecherche);p21.add(bsupprimer);p21.add(bedit);
+		p2.add(p21,BorderLayout.SOUTH);
+		p2.add(jsp,BorderLayout.NORTH);
+		global.add(p2);
+		add(global);
+		
+		
+		bajouter.addActionListener(x->{
+			
+			String nome = tnom.getText();
+			String quantity = tquantity.getText();
+			String type = (String) comboFilliere.getSelectedItem();
+			String place="";
+			if(bh.isSelected()) {
+				place="Storehouse 1";
+			}else if(bf.isSelected()) {
+				place="Storehouse 1";
+			}
+			if(nome.equals("")||quantity.equals("")||place.equals("")) {
+				JOptionPane.showMessageDialog(this, "erreur de saisie");
+			}else {
+				try {
+					
+			        pst = con.prepareStatement("insert into products(name, quantity, type, place) values(?, ?, ?, ?)");
+			        pst.setString(1, nome);
+			        pst.setString(2, quantity);
+			        pst.setString(3, type);
+			        pst.setString(4, place);
+			        pst.executeUpdate();
+			        JOptionPane.showMessageDialog(null, "Products Addedddd!!!!!");
+			        table_load();
+			                       
+			        tnom.setText("");
+			        tquantity.setText("");
+			        comboFilliere.setSelectedIndex(0); 
+			        bg.clearSelection();
+			        
+			       }
+			    catch (SQLException e1) 
+			        {            
+			       e1.printStackTrace();
+			    }
+			}
+		});
+		
+		brecherche.addActionListener(x -> {
+		    try {
+		        String id = tidR.getText();
+		        pst = con.prepareStatement("select name, quantity, type, place from products where id = ?");
+		        pst.setString(1, id);
+		        ResultSet rs = pst.executeQuery();
+		        if (rs.next()) {
+		            String name = rs.getString(1);
+		            String quantity = rs.getString(2);
+		            String type = rs.getString(3);
+		            String place = rs.getString(4); // This should be 4, not 3
+		            // Set retrieved values to corresponding text fields
+		            tnom.setText(name);
+		            tquantity.setText(quantity);
+		            // Assuming comboFilliere is a JComboBox, you need to set its selected item, not setText() as it's not a text field
+		            comboFilliere.setSelectedItem(type);
+		            // Set the selected radio button based on the retrieved place
+		            if (place.equals("Storehouse 1")) {
+		                bh.setSelected(true);
+		            } else if (place.equals("Storehouse 2")) {
+		                bf.setSelected(true);
+		            }
+		        } else {
+		            // Clear text fields if no matching record found
+		            tnom.setText("");
+		            tquantity.setText("");
+		            comboFilliere.setSelectedIndex(0);
+		            bg.clearSelection();
+		        }
+		    } catch (SQLException ex) {
+		        ex.printStackTrace();
+		        // Handle SQL exception
+		    }
+		});
+		
+		bedit.addActionListener(x -> {
+		    String nome, quantity, type, place, id;
+		            
+		    nome = tnom.getText();
+		    quantity = tquantity.getText();
+		    type = (String) comboFilliere.getSelectedItem();
+		    place = "";
+		    if (bh.isSelected()) {
+		        place = "Storehouse 1";
+		    } else if (bf.isSelected()) {
+		        place = "Storehouse 2";
+		    }
+		    id = tidR.getText(); // Assuming tidR contains the ID of the product to be edited
 
-        // Logo
-        ImageIcon logoIcon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
-        Image img = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-        ImageIcon newLogoIcon = new ImageIcon(img);
-        JLabel logoLabel = new JLabel(newLogoIcon);
+		    if (nome.equals("") || quantity.equals("") || place.equals("")) {
+		        JOptionPane.showMessageDialog(this, "Erreur de saisie");
+		    } else {
+		        try {
+		            pst = con.prepareStatement("UPDATE products SET name=?, quantity=?, type=?, place=? WHERE id=?");
+		            pst.setString(1, nome);
+		            pst.setString(2, quantity);
+		            pst.setString(3, type);
+		            pst.setString(4, place);
+		            pst.setString(5, id);
+		            pst.executeUpdate();
+		            JOptionPane.showMessageDialog(null, "Produit mis à jour!");
+		            table_load();
+		            
+		            // Clear input fields after update
+		            tnom.setText("");
+		            tquantity.setText("");
+		            comboFilliere.setSelectedIndex(0);
+		            bg.clearSelection();
+		            tidR.setText(""); // Clear ID field after update
+		        } catch (SQLException e1) {
+		            e1.printStackTrace();
+		        }
+		    }
+		});
+		
+		bsupprimer.addActionListener(x -> {
+		    String idToDelete = tidR.getText(); // Assuming tidR contains the ID of the record to be deleted
+		    
+		    try {
+		        pst = con.prepareStatement("DELETE FROM products WHERE id = ?");
+		        pst.setString(1, idToDelete);
+		        pst.executeUpdate();
+		        JOptionPane.showMessageDialog(null, "Enregistrement supprimé!");
+		        table_load(); // Reload the table after deletion
+		        
+		        // Clear input fields after deletion
+		        tnom.setText("");
+		        tquantity.setText("");
+		        comboFilliere.setSelectedIndex(0);
+		        bg.clearSelection(); // Clear selection of radio buttons
+		        tidR.setText(""); // Clear ID field after deletion
+		    } catch (SQLException e1) {
+		        e1.printStackTrace();
+		    }
+		});
 
-        // User Account Profile
-        ImageIcon userProfileIcon = new ImageIcon("user_profile.png");
-        JButton userProfileButton = new JButton(userProfileIcon);
-        userProfileButton.setPreferredSize(new Dimension(40, 40));
-        userProfileButton.setBackground(Color.WHITE);
-        userProfileButton.setFocusPainted(false);
+	}
+	
+	
+	public ProductManagmentUI() {
+		super("Gestion des Etudients");
+		setVisible(true);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+		Connect();
+		table_load();
+		initialize();
+		
+		pack();
+		
+	}
+	
+	public void table_load()
+	{
+	    try 
+	    {
+	    pst = con.prepareStatement("select * from products");
+	    rs = pst.executeQuery();
+	    tableau.setModel(DbUtils.resultSetToTableModel(rs));
+	} 
+	    catch (SQLException e) 
+	     {
+	        e.printStackTrace();
+	  } 
+	}
+	
+	public void Connect() {
+		
+		try{  
+			   Class.forName("com.mysql.cj.jdbc.Driver");
+			   con=DriverManager.getConnection("jdbc:mysql://localhost:3306/Project","root","");  
+			   
+		   }catch(Exception e){
+			    System.out.println(e);
+		   } 
+		
+		
+	}
+	
+	public static void main(String[] args) {
+		
+		new ProductManagmentUI();
+		
+	}
 
-        // User Name (Clickable)
-        JLabel userNameLabel = new JLabel("John Doe");
-        userNameLabel.setForeground(Color.WHITE);
-        userNameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Set cursor to hand
-
-        // Add action listener to user name label
-        userNameLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // Perform action here
-                //JOptionPane.showMessageDialog(null, "User Profile Clicked");
-                new EditUser();
-            }
-        });
-
-        // Home Page Panel
-        JPanel homePagePanel = new JPanel(new BorderLayout());
-        homePagePanel.setBackground(new Color(230, 230, 230)); // Light gray
-        homePagePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        //-----------------------------------------------------
-
-        JLabel lid = new JLabel("ID");
-        JLabel lname = new JLabel("Name");
-        JLabel ltype = new JLabel("Type");
-        JLabel lplace = new JLabel("Place");
-        JLabel lquantity = new JLabel("Quantity");
-
-        JTextField tid = new JTextField(10);
-        JTextField tname = new JTextField(10);
-        JTextField tplace = new JTextField(10);
-        JTextField tquantity = new JTextField(10);
-        JTextField trecherche = new JTextField(10);
-
-        JComboBox<String> typeDropdown = new JComboBox<>(new String[]{"m1", "m2", "m3"}); // Assuming some default types
-
-        JButton bajouter = new JButton("Add");
-        JButton bannuler = new JButton("Cancel");
-        JButton brecherche = new JButton("Search");
-
-        JButton homeButton = new JButton("Home");
-        JButton manageSalesButton = new JButton("Manage Sales");
-        JButton makeBillButton = new JButton("Make Bill");
-        JButton productManagementButton = new JButton("Product Management");
-
-        TableProductManagment tm = new TableProductManagment();
-        JTable tableau = new JTable(tm);
-        JScrollPane jsp = new JScrollPane(tableau);
-        // Change table title color
-        tableau.getTableHeader().setBackground(new Color(0, 100, 0)); // Darker green
-        tableau.getTableHeader().setForeground(Color.WHITE);
-
-        JPanel p1 = new JPanel(new BorderLayout());
-        JPanel p11 = new JPanel(new GridLayout(5, 1)); // 5 rows, 2 columns
-        JPanel p12 = new JPanel();
-        JPanel p2 = new JPanel(new BorderLayout());
-        JPanel p21 = new JPanel();
-
-        JPanel pt = new JPanel();
-        JPanel pd = new JPanel();
-        JPanel pp = new JPanel();
-        JPanel pl = new JPanel();
-        JPanel pq = new JPanel();
-
-        // Set background colors for panels
-        p1.setBackground(Color.WHITE);
-        p2.setBackground(Color.WHITE);
-        p11.setBackground(Color.WHITE);
-        p12.setBackground(Color.WHITE);
-        p21.setBackground(Color.WHITE);
-
-        // Set fonts for labels
-        Font labelFont = new Font("Arial", Font.BOLD, 14);
-        // Change label text color to darker green
-        lid.setFont(labelFont);
-        lid.setForeground(new Color(0, 100, 0)); // Darker green
-        lname.setFont(labelFont);
-        lname.setForeground(new Color(0, 100, 0)); // Darker green
-        ltype.setFont(labelFont);
-        ltype.setForeground(new Color(0, 100, 0)); // Darker green
-        lplace.setFont(labelFont);
-        lplace.setForeground(new Color(0, 100, 0)); // Darker green
-        lquantity.setFont(labelFont);
-        lquantity.setForeground(new Color(0, 100, 0)); // Darker green
-        bajouter.setFont(labelFont);
-        bannuler.setFont(labelFont);
-        brecherche.setFont(labelFont);
-
-        // Set background color and text color for buttons
-        // Change button background to darker green and text color to white
-        bajouter.setBackground(new Color(0, 100, 0)); // Darker green
-        bajouter.setForeground(Color.WHITE);
-        bannuler.setBackground(new Color(0, 100, 0)); // Darker green
-        bannuler.setForeground(Color.WHITE);
-        brecherche.setBackground(new Color(0, 100, 0)); // Darker green
-        brecherche.setForeground(Color.WHITE);
-
-        pt.add(lid);
-        pt.add(tid);
-
-        pd.add(lname);
-        pd.add(tname);
-
-        pp.add(lplace);
-        pp.add(tplace);
-
-        pl.add(ltype);
-        pl.add(typeDropdown);
-
-        pq.add(lquantity);
-        pq.add(tquantity);
-
-        p11.add(pt);
-        p11.add(pd);
-        p11.add(pp);
-        p11.add(pl);
-        p11.add(pq);
-        p1.add(p11, BorderLayout.NORTH);
-
-        p12.add(bajouter);
-        p12.add(bannuler);
-        p1.add(p12, BorderLayout.SOUTH);
-
-
-        p21.add(brecherche);
-        p21.add(trecherche);
-        p2.add(p21, BorderLayout.NORTH);
-
-        JPanel CORRECTPanel = new JPanel(new BorderLayout());
-
-        CORRECTPanel.add(p1, BorderLayout.NORTH);
-        CORRECTPanel.add(jsp, BorderLayout.CENTER);
-        CORRECTPanel.add(p2, BorderLayout.SOUTH);
-
-        homePagePanel.add(CORRECTPanel, BorderLayout.CENTER);
-
-        //-----------------------------------------------------
-
-        // Side Bar
-        JPanel sideBarPanel = new JPanel();
-        sideBarPanel.setBackground(new Color(0, 100, 0)); // Less bright green color
-        sideBarPanel.setPreferredSize(new Dimension(200, getHeight()));
-
-        // Add options to the side bar
-        styleButton(homeButton);
-        styleButton(manageSalesButton);
-        styleButton(makeBillButton);
-        styleButton(productManagementButton);
-
-        // Add action listeners to the side bar buttons
-        homeButton.addActionListener(e -> {
-            // Show home page panel
-            new Home();
-            dispose();
-            // Hide other panels if needed
-        });
-        makeBillButton.addActionListener(e -> {
-            // Show home page panel
-            new MakeBillUI();
-            dispose();
-            // Hide other panels if needed
-        });
-        productManagementButton.addActionListener(e -> {
-            // Show home page panel
-            new ProductManagmentUI();
-            dispose();
-            // Hide other panels if needed
-        });
-        manageSalesButton.addActionListener(e -> {
-            // Show home page panel
-            new ManageSalesUI();
-            dispose();
-            // Hide other panels if needed
-        });
-
-        // Add buttons to the side bar panel
-        sideBarPanel.setLayout(new BoxLayout(sideBarPanel, BoxLayout.Y_AXIS));
-        sideBarPanel.add(Box.createVerticalStrut(40)); // Space at the top
-        sideBarPanel.add(homeButton);
-        sideBarPanel.add(Box.createVerticalStrut(20)); // Space between buttons
-        sideBarPanel.add(manageSalesButton);
-        sideBarPanel.add(Box.createVerticalStrut(20)); // Space between buttons
-        sideBarPanel.add(makeBillButton);
-        sideBarPanel.add(Box.createVerticalStrut(20)); // Space between buttons
-        sideBarPanel.add(productManagementButton);
-
-        // Main Panel
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE); // White background
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(0, 100, 0)); // Less bright green color
-        headerPanel.add(logoLabel, BorderLayout.WEST);
-        JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(0, 100, 0)); // Less bright green color
-        JLabel appTitleLabel = new JLabel("Sales Management App");
-        appTitleLabel.setForeground(Color.WHITE);
-        appTitleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titlePanel.add(appTitleLabel);
-        headerPanel.add(titlePanel, BorderLayout.CENTER);
-        JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        userPanel.setBackground(new Color(0, 100, 0)); // Less bright green color
-        userPanel.add(userNameLabel);
-        userPanel.add(userProfileButton);
-        headerPanel.add(userPanel, BorderLayout.EAST);
-
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
-        mainPanel.add(homePagePanel, BorderLayout.CENTER);
-        mainPanel.add(sideBarPanel, BorderLayout.WEST);
-
-        // Add components to the frame
-        add(mainPanel);
-        
-        
-        // SQL MANAGEMENT (  ADD )
-        bajouter.addActionListener(e -> {
-            // Getting info from textfield
-        	int id= Integer.parseInt(tid.getText());
-        	String place = tplace.getText();
-        	String selectedType = (String) typeDropdown.getSelectedItem(); 
-        	String name=tname.getText();
-        	int qts=Integer.parseInt(tquantity.getText());
-        	// calling the add method
-        	ProductManipulator p = new ProductManipulator();
-        	p.addProduct(id, name,selectedType, place, qts)  ;    
-        	// initial info from textfield
-        	tid.setText("");
-        	tplace.setText("");
-        	tname.setText("");
-        	tquantity.setText("");
-        });
-        
-        
-     // NO SQL MANAGEMENT (  cancel )
-        bannuler.addActionListener(e -> {
-            // initial info from textfield
-        	tid.setText("");
-        	tplace.setText("");
-        	tname.setText("");
-        	tquantity.setText("");
-        });
-        
-        
-         
-        setVisible(true);
-
-    }
-
-    // Method to style buttons
-    private void styleButton(JButton button) {
-        button.setForeground(Color.WHITE);
-        button.setBackground(new Color(0, 100, 0)); // Less bright green color
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30)); // Set padding
-        button.setAlignmentX(Component.CENTER_ALIGNMENT); // Align buttons to the center horizontally
-        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, button.getPreferredSize().height));
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(ProductManagmentUI::new);
-    }
+	
 }

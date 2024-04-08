@@ -1,15 +1,29 @@
 package UI;
 
 import javax.swing.*;
+
+import Sql.DatabaseConnector;
+import Sql.SalesManipulator;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class ManageSalesUI extends JFrame {
 
-    public ManageSalesUI() {
+    public ManageSalesUI(String passed) {
     	
         super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -39,14 +53,14 @@ public class ManageSalesUI extends JFrame {
         JLabel logoLabel = new JLabel(newLogoIcon);
 
         // User Account Profile
-        ImageIcon userProfileIcon = new ImageIcon("user_profile.png");
+        ImageIcon userProfileIcon = new ImageIcon(path(passed));
         JButton userProfileButton = new JButton(userProfileIcon);
         userProfileButton.setPreferredSize(new Dimension(40, 40));
         userProfileButton.setBackground(Color.WHITE);
         userProfileButton.setFocusPainted(false);
 
      // User Name (Clickable)
-        JLabel userNameLabel = new JLabel("John Doe");
+        JLabel userNameLabel = new JLabel(passed);
         userNameLabel.setForeground(Color.WHITE);
         userNameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Set cursor to hand
 
@@ -73,9 +87,9 @@ public class ManageSalesUI extends JFrame {
         JLabel totalRevenueLabel = new JLabel("<html><font size='6' color='#006400'>Month's income</font></html>");
         JLabel Profit = new JLabel("<html><font size='6' color='#006400'>income deviation</font></html>");
         
-        JLabel todaySaleLabelT = new JLabel("<html><font size='6' color='#006400'>12$</font></html>");
-        JLabel totalRevenueLabelT = new JLabel("<html><font size='6' color='#006400'>120$</font></html>");
-        JLabel ProfitT = new JLabel("<html><font size='6' color='#006400'>+50$</font></html>");
+        JLabel todaySaleLabelT = new JLabel("<html><font size='6' color='#006400'>"+ todaysIncome()+"</font></html>");
+        JLabel totalRevenueLabelT = new JLabel("<html><font size='6' color='#006400'>"+monthIncome()+"</font></html>");
+        JLabel ProfitT = new JLabel("<html><font size='6' color='#006400'>"+todayIncomeMinusAverage()+"</font></html>");
         
         JLabel from = new JLabel("<html><font size='4' color='#006400'>From</font></html>");
         JLabel to = new JLabel("<html><font size='4' color='#006400'>To</font></html>");
@@ -96,10 +110,17 @@ public class ManageSalesUI extends JFrame {
         featurePanel.setLayout(new BorderLayout());
         toppanel.setLayout(new BorderLayout());
         
-        //Table 
-        SalesTableModel model = new SalesTableModel(data, columns);
+     // Table
+        SalesTableModel model = new SalesTableModel(new String[]{"Date", "Expenses", "Income", "Profit"});
         JTable table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
+
+        // Fetch data and populate the table
+        List<SalesRecord> salesRecords = SalesManipulator.upload(new Date(0), new Date(System.currentTimeMillis()));
+        for (SalesRecord record : salesRecords) {
+            model.addRow(new Object[]{record.getDate(), record.getExpenses(), record.getIncome(), record.getProfit()});
+        }
+
         
         
         // LABEL PANEL 1
@@ -153,27 +174,62 @@ public class ManageSalesUI extends JFrame {
         // Add action listeners to the side bar buttons
         homeButton.addActionListener(e -> {
             // Show home page panel
-            new Home();
+            new Home(passed);
             dispose();
             // Hide other panels if needed
         });
         makeBillButton.addActionListener(e -> {
             // Show home page panel
-        	new MakeBillUI();
+        	new MakeBillUI(passed);
         	 dispose();
             // Hide other panels if needed
         });
         productManagementButton.addActionListener(e -> {
             // Show home page panel
-            new ProductManagmentUI();
-            dispose();
+            //new ProductManagmentUI(passed);
+            //dispose();
             // Hide other panels if needed
         });
         manageSalesButton.addActionListener(e -> {
             // Show home page panel
-            new ManageSalesUI();
+            new ManageSalesUI(passed);
             dispose();
             // Hide other panels if needed
+        });
+        searchButton.addActionListener(e -> {
+            String fromDateText = fromT.getText();
+            String toDateText = toT.getText();
+
+            // Check if the input fields are empty
+            if (fromDateText.isEmpty() || toDateText.isEmpty()) {
+                // If empty, use default dates
+                List<SalesRecord> fetchedRecords = SalesManipulator.upload(new Date(0), new Date(System.currentTimeMillis()));
+                model.clearData();
+                for (SalesRecord record : salesRecords) {
+                    model.addRow(new Object[]{record.getDate(), record.getExpenses(), record.getIncome(), record.getProfit()});
+                }
+            } else {
+                // If not empty, parse the dates and perform the search
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date start;
+                Date finish;
+                try {
+                    start = dateFormat.parse(fromDateText);
+                    finish = dateFormat.parse(toDateText);
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
+                    return; // Exit the action listener if parsing fails
+                }
+
+                // Clear existing data from the table
+                model.clearData();
+
+                // SEARCH IT
+                List<SalesRecord> fetchedRecords = SalesManipulator.upload(start, finish);
+                for (SalesRecord record : fetchedRecords) {
+                    model.addRow(new Object[]{record.getDate(), record.getExpenses(), record.getIncome(), record.getProfit()});
+                }
+            }
         });
 
 
@@ -228,8 +284,99 @@ public class ManageSalesUI extends JFrame {
         button.setAlignmentX(Component.CENTER_ALIGNMENT); // Align buttons to the center horizontally
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, button.getPreferredSize().height));
     }
+    public String todaysIncome() {
+        // Get today's date
+        Date today = new Date(System.currentTimeMillis());
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(ManageSalesUI::new);
+        // Fetch sales records for today
+        List<SalesRecord> salesRecords = SalesManipulator.upload(today, today);
+
+        // Sum up the income from the fetched records
+        double totalIncome = 0.0;
+        for (SalesRecord record : salesRecords) {
+            totalIncome += record.getIncome();
+        }
+
+        // Format the total income with a "$" sign
+        DecimalFormat df = new DecimalFormat("#.##"); // Adjust the pattern as needed
+        String formattedIncome = "$" + df.format(totalIncome);
+
+        return formattedIncome;
+    }
+    
+    
+    public String monthIncome() {
+        // Get the current date
+        Date currentDate = new Date();
+
+        // Get the first day of the current month
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date firstDayOfMonth = calendar.getTime();
+
+        // Fetch sales records for the current month
+        List<SalesRecord> salesRecords = SalesManipulator.upload(firstDayOfMonth, currentDate);
+
+        // Sum up the income from the fetched records
+        double totalIncome = 0.0;
+        for (SalesRecord record : salesRecords) {
+            totalIncome += record.getIncome();
+        }
+
+        // Format the total income with a "$" sign
+        DecimalFormat df = new DecimalFormat("#.##"); // Adjust the pattern as needed
+        String formattedIncome = "$" + df.format(totalIncome);
+
+        return formattedIncome;
+    }
+    public String todayIncomeMinusAverage() {
+        Date today = new Date(System.currentTimeMillis());
+        List<SalesRecord> todayRecords = SalesManipulator.upload(today, today);
+
+        // Calculate today's total income
+        double todayIncome = 0.0;
+        for (SalesRecord record : todayRecords) {
+            todayIncome += record.getIncome();
+        }
+
+        // Calculate average income from the database
+        double avgIncome = SalesManipulator.avgIncomeFromDatabase();
+        
+        double difference = todayIncome - avgIncome;//difference
+
+        
+     // Format the total income with a "$" sign
+        DecimalFormat df = new DecimalFormat("#.##"); // Adjust the pattern as needed
+        String formattedIncome = "$" + df.format(difference);
+
+
+        // Return today's income minus average income
+        return formattedIncome;
+    }
+    
+ // get pic PATH
+    public static String path(String nom) {
+    String path = null;
+    String sql = "SELECT PATH FROM user WHERE NAME = ?";
+
+    try (Connection conn = DatabaseConnector.getConnection();
+         PreparedStatement statement = conn.prepareStatement(sql)) {
+        statement.setString(1, nom);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                path = resultSet.getString("PATH");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle the exception or log it as needed
+    }
+
+    return path;
+}
+    public static void main(String[] args, String passed) {
+    	SwingUtilities.invokeLater(() -> new ManageSalesUI(passed));
     }
 }
