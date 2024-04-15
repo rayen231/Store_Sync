@@ -1,4 +1,4 @@
-package Sql;
+package backEnd;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,7 @@ public class LoginManipulator {
         		+ "FROM user "
         		+ "WHERE name = ? AND password = ?";
         
-        try (Connection conn = UserConnector.getConnection();
+        try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
             
             // Set parameters

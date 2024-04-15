@@ -1,4 +1,4 @@
-package UI;
+package frontEnd;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;

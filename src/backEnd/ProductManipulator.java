@@ -1,4 +1,4 @@
-package Sql;
+package backEnd;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

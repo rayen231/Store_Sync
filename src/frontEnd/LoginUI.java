@@ -1,7 +1,9 @@
-package UI;
+package frontEnd;
 
 import javax.swing.*;
-import Sql.LoginManipulator;
+
+import backEnd.LoginManipulator;
+
 import java.awt.*;
 import java.awt.event.*;
 

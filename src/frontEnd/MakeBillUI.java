@@ -1,4 +1,4 @@
-package UI;
+package frontEnd;
 
 import javax.swing.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -10,7 +10,9 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import Sql.DatabaseConnector;
+import backEnd.DatabaseConnector;
+import backEnd.MakeBillManipulator;
+import backEnd.ProfilManipulator;
 
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import javax.print.PrintService;
@@ -61,9 +63,13 @@ public class MakeBillUI extends JFrame {
         Image img = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         ImageIcon newLogoIcon = new ImageIcon(img);
         JLabel logoLabel = new JLabel(newLogoIcon);
+        
+      //instance of profilmanipulator*
+        ProfilManipulator m= new ProfilManipulator();
+
 
         // User Account Profile
-        ImageIcon userProfileIcon = new ImageIcon(path(passed));
+        ImageIcon userProfileIcon = new ImageIcon(m.path(passed));
         JButton userProfileButton = new JButton(userProfileIcon);
         userProfileButton.setPreferredSize(new Dimension(40, 40));
         userProfileButton.setBackground(Color.WHITE);
@@ -188,10 +194,13 @@ public class MakeBillUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
             	
+            	//Make instance 
+            	MakeBillManipulator m= new MakeBillManipulator();
+            	
             	//adding bill into the DB
             	String cin=cinTextField.getText();
             	String name=nameTextField.getText();
-            	add(cin,name,textQuantityDict);
+            	m.add(cin,name,textQuantityDict);
             	
             	//Making pdf content
             	String content="NAME : "+name+"\nCIN : "+cin+"\nITEMS : \n"+textQuantityDict.toString();
@@ -209,7 +218,7 @@ public class MakeBillUI extends JFrame {
                 }
 
                 // Print the generated PDF file
-                printPDF("output.pdf");
+                m.printPDF("output.pdf");
             	
             }
         });
@@ -310,71 +319,7 @@ public class MakeBillUI extends JFrame {
         button.setAlignmentX(Component.CENTER_ALIGNMENT); // Align buttons to the center horizontally
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, button.getPreferredSize().height));
     }
-    
-
- // get pic PATH
-    public static String path(String nom) {
-    String path = null;
-    String sql = "SELECT PATH FROM user WHERE NAME = ?";
-
-    try (Connection conn = DatabaseConnector.getConnection();
-         PreparedStatement statement = conn.prepareStatement(sql)) {
-        statement.setString(1, nom);
-
-        try (ResultSet resultSet = statement.executeQuery()) {
-            if (resultSet.next()) {
-                path = resultSet.getString("PATH");
-            }
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        // Handle the exception or log it as needed
-    }
-
-    return path;
-}
-    
-    //add bill in DB
-    public void add(String cin,String name,Map<String, Integer> items)
-    {
-    	// Convert the map to a string format
-        StringBuilder itemsStr = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : items.entrySet()) {
-            itemsStr.append(entry.getKey()).append(":").append(entry.getValue()).append(",");
-        }
-        String itemsString = itemsStr.toString();
-
-        // SQL statement to insert data into the Bills table
-        String sql = "INSERT INTO Bills (CIN, NAME, ITEMS) VALUES (?, ?, ?)";
-
-        try (Connection conn = DatabaseConnector.getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, cin);
-            statement.setString(2, name);
-            statement.setString(3, itemsString);
-
-            // Execute the insert statement
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Handle the exception or log it as needed
-        }
-    }
-    // printer function
-    public static void printPDF(String filename) {
-  	  try {
-  	    // Open the PDF with the default PDF viewer
-  	    Runtime.getRuntime().exec("explorer.exe " + filename);
-  	    // This might prompt a print dialog within the viewer.
-  	  } catch (Exception e) {
-  	    e.printStackTrace();
-  	  }
-  	}
-    
-    
-    
-    
-    
+  
     public static void main(String[] args, String passed) {
     	SwingUtilities.invokeLater(() -> new MakeBillUI(passed));
     }

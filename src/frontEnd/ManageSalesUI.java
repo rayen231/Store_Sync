@@ -1,9 +1,10 @@
-package UI;
+package frontEnd;
 
 import javax.swing.*;
 
-import Sql.DatabaseConnector;
-import Sql.SalesManipulator;
+import backEnd.DatabaseConnector;
+import backEnd.ProfilManipulator;
+import backEnd.SalesManipulator;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -51,9 +52,13 @@ public class ManageSalesUI extends JFrame {
         Image img = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         ImageIcon newLogoIcon = new ImageIcon(img);
         JLabel logoLabel = new JLabel(newLogoIcon);
+        
+      //instance of profilmanipulator*
+        ProfilManipulator m= new ProfilManipulator();
+
 
         // User Account Profile
-        ImageIcon userProfileIcon = new ImageIcon(path(passed));
+        ImageIcon userProfileIcon = new ImageIcon(m.path(passed));
         JButton userProfileButton = new JButton(userProfileIcon);
         userProfileButton.setPreferredSize(new Dimension(40, 40));
         userProfileButton.setBackground(Color.WHITE);
@@ -69,7 +74,7 @@ public class ManageSalesUI extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Perform action here
-                JOptionPane.showMessageDialog(null, "User Profile Clicked");
+                //JOptionPane.showMessageDialog(null, "User Profile Clicked");
                 new EditUser(passed);
             }
         });
@@ -355,27 +360,7 @@ public class ManageSalesUI extends JFrame {
         return formattedIncome;
     }
     
- // get pic PATH
-    public static String path(String nom) {
-    String path = null;
-    String sql = "SELECT PATH FROM user WHERE NAME = ?";
-
-    try (Connection conn = DatabaseConnector.getConnection();
-         PreparedStatement statement = conn.prepareStatement(sql)) {
-        statement.setString(1, nom);
-
-        try (ResultSet resultSet = statement.executeQuery()) {
-            if (resultSet.next()) {
-                path = resultSet.getString("PATH");
-            }
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        // Handle the exception or log it as needed
-    }
-
-    return path;
-}
+ 
     public static void main(String[] args, String passed) {
     	SwingUtilities.invokeLater(() -> new ManageSalesUI(passed));
     }
