@@ -47,7 +47,7 @@ public class MakeBillUI extends JFrame {
 	public MakeBillUI(String passed) {
         super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(1130,700);
         setLocationRelativeTo(null);
         
         // Initialize the map in the constructor
@@ -251,8 +251,8 @@ public class MakeBillUI extends JFrame {
         });
         productManagementButton.addActionListener(e -> {
             // Show home page panel
-            //new ProductManagmentUI();
-            //dispose();
+        	 new ManagementProduct(passed);
+             dispose();
             // Hide other panels if needed
         });
         manageSalesButton.addActionListener(e -> {

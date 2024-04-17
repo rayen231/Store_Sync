@@ -28,7 +28,7 @@ public class ManageSalesUI extends JFrame {
     	
         super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(1000,700);
         setLocationRelativeTo(null);
         
         //Change the icon window image
@@ -36,15 +36,6 @@ public class ManageSalesUI extends JFrame {
         Image iconImage = icon.getImage();
         setIconImage(iconImage);
         
-        //Table 
-        Object[][] data = {
-                {"2024-01-01", 1000, 2000, 1000},
-                {"2024-01-02", 1500, 2500, 1000},
-                {"2024-01-03", 1200, 1800, 600},
-                {"2024-01-04", 800, 2200, 1400},
-                {"2024-01-05", 1100, 2100, 1000},
-                {"2024-01-06", 1300, 2400, 1100}
-        };
         String[] columns = {"Date", "Expenses", "Income", "Profit"};
 
         // Logo
@@ -191,8 +182,8 @@ public class ManageSalesUI extends JFrame {
         });
         productManagementButton.addActionListener(e -> {
             // Show home page panel
-            //new ProductManagmentUI(passed);
-            //dispose();
+        	 new ManagementProduct(passed);
+             dispose();
             // Hide other panels if needed
         });
         manageSalesButton.addActionListener(e -> {

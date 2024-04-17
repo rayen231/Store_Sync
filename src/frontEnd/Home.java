@@ -2,6 +2,11 @@ package frontEnd;
 
 import javax.swing.*;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.DefaultCategoryDataset;
+
 import backEnd.DatabaseConnector;
 import backEnd.ProfilManipulator;
 
@@ -14,13 +19,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import backEnd.HomeManipulator;
 
 public class Home extends JFrame {
+	private DefaultCategoryDataset dataset;
 
     public Home(String passed) {
         super("Sales Management App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(1130,700);
         setLocationRelativeTo(null);
         //Change the icon window image
         ImageIcon icon = new ImageIcon("/Users/Rayen/eclipse-workspace/Project/src/UI/PIC/logo.png");
@@ -57,6 +64,10 @@ public class Home extends JFrame {
             }
         });
 
+        
+        
+        
+        
         // Home Page Panel
         JPanel homePagePanel = new JPanel(new BorderLayout());
         homePagePanel.setBackground(new Color(230, 230, 230)); // Light gray
@@ -66,15 +77,65 @@ public class Home extends JFrame {
         JLabel titleLabel = new JLabel("<html><div style='text-align: center;'><font size='6' color='#006400'>Welcome to Sales Management App</font></div></html>");
         homePagePanel.add(titleLabel, BorderLayout.NORTH);
 
-        // Features
-        JLabel todaySaleLabel = new JLabel("<html><font size='6' color='#006400'>Today's Sale: $5000</font></html>");
-        JLabel totalRevenueLabel = new JLabel("<html><font size='6' color='#006400'>Total Sales Revenue: $10000</font></html>");
-        JPanel featurePanel = new JPanel();
-        featurePanel.setLayout(new BoxLayout(featurePanel, BoxLayout.Y_AXIS));
-        featurePanel.add(todaySaleLabel);
-        featurePanel.add(totalRevenueLabel);
-        homePagePanel.add(featurePanel, BorderLayout.CENTER);
+        // Features panel
+        JPanel featurePanel = new JPanel(new GridBagLayout());
+        					//featurePanel.setLayout(new BoxLayout(featurePanel, BoxLayout.Y_AXIS));
+         
+        // Create dataset
+        DefaultCategoryDataset dataset = HomeManipulator.generateDataset();
+        
+        
+        // Create chart
+        JFreeChart chart = ChartFactory.createLineChart(
+                "Dynamic Graph Example",
+                "X-Axis",
+                "Y-Axis",
+                dataset
+        );
+        //create total income labels
+        JLabel topLabel = new JLabel("<html><div style='text-align: center;'><font size='6' color='#5C3317'>Total income</font></div></html>");
+        JLabel bottompanel = new JLabel("<html><div style='text-align: center;'><font size='6' color='#8B0000'>"+HomeManipulator.getTotalIncome()+"</font></div></html>");
+        
 
+        // Create Panel
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(600, 400));
+        
+        //create totalincomepanel
+        JPanel totalincomepanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 5, 5); // Adjust the insets to reduce spacing
+        
+        totalincomepanel.add(topLabel, gbc);
+        gbc.gridy = 1;
+        totalincomepanel.add(bottompanel, gbc);
+        
+     // Define GridBagConstraints for chartPanel
+        GridBagConstraints gbcChartPanel = new GridBagConstraints();
+        gbcChartPanel.gridx = 0;
+        gbcChartPanel.gridy = 0;
+        gbcChartPanel.weightx = 0.8; // 80% of the available horizontal space
+        gbcChartPanel.fill = GridBagConstraints.BOTH;
+
+        // Define GridBagConstraints for totalIncomePanel
+        GridBagConstraints gbcTotalIncomePanel = new GridBagConstraints();
+        gbcTotalIncomePanel.gridx = 1;
+        gbcTotalIncomePanel.gridy = 0;
+        gbcTotalIncomePanel.weightx = 0.2; // 20% of the available horizontal space
+        gbcTotalIncomePanel.fill = GridBagConstraints.BOTH;
+
+        
+        // Add components to featurePanel
+        featurePanel.add(chartPanel, gbcChartPanel);
+        featurePanel.add(totalincomepanel, gbcTotalIncomePanel);
+        //home panel adding
+        homePagePanel.add(featurePanel, BorderLayout.SOUTH);
+
+        
+        
+        
         // Side Bar
         JPanel sideBarPanel = new JPanel();
         sideBarPanel.setBackground(new Color(0, 100, 0)); // Less bright green color
@@ -105,8 +166,8 @@ public class Home extends JFrame {
         });
         productManagementButton.addActionListener(e -> {
             // Show home page panel
-            //new ProductManagmentUI(passed);
-            //dispose();
+            new ManagementProduct(passed);
+            dispose();
             // Hide other panels if needed
         });
         manageSalesButton.addActionListener(e -> {

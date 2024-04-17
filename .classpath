@@ -55,5 +55,10 @@
 	<classpathentry kind="lib" path="C:/Users/Rayen/Downloads/iText7-Core-7.1.4/svg-7.1.4-javadoc.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Rayen/Downloads/iText7-Core-7.1.4/svg-7.1.4-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Rayen/Downloads/jar_files/itextpdf-5.5.9.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Rayen/Downloads/jfreechart-1.5.4.jar">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

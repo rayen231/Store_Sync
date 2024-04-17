@@ -5,12 +5,31 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnector {
-    // JDBC URL, username, and password of MySQL server
-    private static final String URL = "jdbc:mysql://localhost:3306/Project";
 
-    public static Connection getConnection() {
+ // JDBC URL, username, and password of MySQL server
+    private static final String URL = "jdbc:mysql://localhost:3306/Project";
+    private static Connection connection = null;
+
+    // Private constructor to prevent instantiation from outside
+    private DatabaseConnector() {}
+
+    public static synchronized Connection getConnection() {
+    	//there's a chance that multiple threads could concurrently access the getConnection() method thats why synchronized made it Thread Safety
         try {
-            return DriverManager.getConnection(URL,"root","");
+            // Check if connection is closed or invalid, then create a new one
+            if (connection == null || connection.isClosed()) {
+                createConnection();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to check connection status.", e);
+        }
+        return connection;
+    }
+
+    private static synchronized void createConnection() {
+        try {
+            connection = DriverManager.getConnection(URL, "root", "");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to connect to database.", e);

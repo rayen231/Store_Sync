@@ -16,7 +16,7 @@ public class LoginUI extends JFrame {
     
     // Text Fields
     JTextField usernameField = new JTextField(15);
-    JPasswordField passwordField = new JPasswordField(15);
+    JPasswordField passwordField = new JPasswordField(15);	
 
     // Buttons
     JButton loginButton = new JButton("Login");
